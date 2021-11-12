@@ -1,7 +1,7 @@
 mod token;
 mod data;
 
-use std::{convert::TryInto, io};
+use std::io;
 use data::Data;
 use token::Token;
 
