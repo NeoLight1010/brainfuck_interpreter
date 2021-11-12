@@ -1,6 +1,8 @@
 mod token;
+mod data;
 
-use std::{collections::HashMap, convert::TryInto, io};
+use std::{convert::TryInto, io};
+use data::Data;
 use token::Token;
 
 
@@ -16,49 +18,26 @@ fn main() -> io::Result<()> {
 }
 
 fn interpret(code: &String) {
-    let mut data: HashMap<i32, i32> = HashMap::new();
-    let mut pointer = 0;
+    let mut data = Data::new();
 
     for c in code.chars() {
         match c {
             Token::SHIFT_LEFT => {
-                pointer -= 1;
+                data.dec_pointer();
             }
 
             Token::SHIFT_RIGHT => {
-                pointer += 1;
+                data.inc_pointer();
             }
 
-            Token::INC_DATA => match data.get_mut(&pointer) {
-                Some(v) => {
-                    *v += 1;
-                }
-
-                None => {
-                    data.insert(pointer, 1);
-                }
+            Token::INC_DATA => {
+                data.inc_cell();
             },
 
-            Token::DEC_DATA => match data.get_mut(&pointer) {
-                Some(v) => {
-                    *v -= 1;
-                }
-
-                None => {
-                    data.insert(pointer, -1);
-                }
-            },
+            Token::DEC_DATA => { data.dec_cell() }
 
             Token::PRINT_BYTE => {
-                match data.get(&pointer) {
-                    Some(_) => {}
-
-                    None => {
-                        data.insert(pointer, 0);
-                    }
-                }
-
-                println!("{}", data.get(&pointer).unwrap());
+                println!("{}", data.get_cell());
             }
 
             Token::READ_BYTE => {
@@ -67,10 +46,7 @@ fn interpret(code: &String) {
 
                 stdin.read_line(&mut buffer).unwrap();
 
-                data.insert(
-                    pointer,
-                    (buffer.chars().nth(0).unwrap() as u32).try_into().unwrap(),
-                );
+                data.set_cell(buffer.chars().nth(0).unwrap() as u32);
             }
 
             Token::WHILE_START => {}
