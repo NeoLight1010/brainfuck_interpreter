@@ -1,26 +1,73 @@
 mod token;
 mod data;
+mod bf_code;
 
 use std::io;
+use bf_code::BFCode;
 use data::Data;
 use token::Token;
 
 
-fn main() -> io::Result<()> {
-    let mut buffer = String::new();
+fn main() -> Result<(), String> {
+    let mut buffer: String = String::new();
 
     let stdin = io::stdin();
-    stdin.read_line(&mut buffer)?;
+    match stdin.read_line(&mut buffer) {
+        Ok(_) => {}
+        Err(_) => {
+            return Err("Error reading from stdin.".to_string());
+        }
+    }
 
-    interpret(&buffer);
+    let code = analyze(&buffer)?;
+
+    interpret(&code);
 
     Ok(())
 }
 
-fn interpret(code: &String) {
-    let mut data = Data::new();
+fn analyze(text: &String) -> Result<BFCode, String> {
+    let mut bf_code = BFCode::new(text);
+    let mut bracket_stack: Vec<usize> = vec![];
 
-    for c in code.chars() {
+    for (i, c) in bf_code.text.chars().enumerate() {
+        match c {
+            Token::WHILE_START => {
+                bracket_stack.push(i);
+            }
+
+            Token::WHILE_END => {
+                let start = bracket_stack.pop();
+
+                match start {
+                    Some(s) => {
+                        bf_code.loops.insert(s, i);
+                    }
+
+                    None => {
+                        return Err("Unmatched '['.".to_string());
+                    }
+                }
+            }
+
+            _ => {}
+        }
+    }
+
+    if !bracket_stack.is_empty() {
+        return Err("Unmatched '['.".to_string());
+    }
+
+    Ok(bf_code)
+}
+
+fn interpret(code: &BFCode) {
+    let mut data = Data::new();
+    let mut cursor: usize = 0;
+
+    while cursor < code.text.len() {
+        let c = code.text.chars().nth(cursor).unwrap();
+
         match c {
             Token::SHIFT_LEFT => {
                 data.dec_pointer();
@@ -49,14 +96,24 @@ fn interpret(code: &String) {
                 data.set_cell(buffer.chars().nth(0).unwrap() as u32);
             }
 
-            Token::WHILE_START => {}
+            Token::WHILE_START => {
+                if data.get_cell() == 0 {
+                    cursor = *code.loops.get_by_left(&cursor).unwrap();
+                }
+            }
 
-            Token::WHILE_END => {}
+            Token::WHILE_END => {
+                if data.get_cell() != 0 {
+                    cursor = *code.loops.get_by_right(&cursor).unwrap();
+                }
+            }
 
             '\n' => {}
 
             _ => {}
         }
+
+        cursor += 1;
     }
 }
 
