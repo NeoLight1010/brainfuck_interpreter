@@ -19,11 +19,17 @@ fn main() -> Result<(), String> {
         }
     }
 
-    let code = analyze(&buffer)?;
+    let result = run(&buffer)?;
+    println!("{}", result);
+
+    Ok(())
+}
+
+fn run(text: &String) -> Result<String, String> {
+    let code = analyze(text)?;
     let result = interpret(&code);
 
-    println!("{}", result);
-    Ok(())
+    Ok(result)
 }
 
 fn analyze(text: &String) -> Result<BFCode, String> {
@@ -122,4 +128,13 @@ fn interpret(code: &BFCode) -> String {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hello_world() {
+        let code = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.".to_string();
+
+        assert_eq!(run(&code).unwrap(), "Hello World!\n");
+    }
+}
