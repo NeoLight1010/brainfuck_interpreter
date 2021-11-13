@@ -84,7 +84,7 @@ fn interpret(code: &BFCode) {
             Token::DEC_DATA => { data.dec_cell() }
 
             Token::PRINT_BYTE => {
-                println!("{}", data.get_cell());
+                print!("{}", char::from_u32(data.get_cell()).unwrap());
             }
 
             Token::READ_BYTE => {
