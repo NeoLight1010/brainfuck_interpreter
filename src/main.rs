@@ -19,13 +19,13 @@ fn main() -> Result<(), String> {
         }
     }
 
-    let result = run(&buffer)?;
+    let result = execute(&buffer)?;
     println!("{}", result);
 
     Ok(())
 }
 
-fn run(text: &String) -> Result<String, String> {
+fn execute(text: &String) -> Result<String, String> {
     let code = analyze(text)?;
     let result = interpret(&code);
 
@@ -135,6 +135,6 @@ mod tests {
     fn test_hello_world() {
         let code = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.".to_string();
 
-        assert_eq!(run(&code).unwrap(), "Hello World!\n");
+        assert_eq!(execute(&code).unwrap(), "Hello World!\n");
     }
 }
