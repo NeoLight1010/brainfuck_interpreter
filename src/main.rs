@@ -45,7 +45,7 @@ fn analyze(text: &String) -> Result<BFCode, String> {
                     }
 
                     None => {
-                        return Err("Unmatched '['.".to_string());
+                        return Err("Unmatched ']'.".to_string());
                     }
                 }
             }
