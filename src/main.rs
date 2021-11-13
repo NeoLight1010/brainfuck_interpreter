@@ -20,9 +20,9 @@ fn main() -> Result<(), String> {
     }
 
     let code = analyze(&buffer)?;
+    let result = interpret(&code);
 
-    interpret(&code);
-
+    println!("{}", result);
     Ok(())
 }
 
@@ -61,7 +61,9 @@ fn analyze(text: &String) -> Result<BFCode, String> {
     Ok(bf_code)
 }
 
-fn interpret(code: &BFCode) {
+fn interpret(code: &BFCode) -> String {
+    let mut result = String::new();
+
     let mut data = Data::new();
     let mut cursor: usize = 0;
 
@@ -84,7 +86,7 @@ fn interpret(code: &BFCode) {
             Token::DEC_DATA => { data.dec_cell() }
 
             Token::PRINT_BYTE => {
-                print!("{}", char::from_u32(data.get_cell()).unwrap());
+                result.push(char::from_u32(data.get_cell()).unwrap());
             }
 
             Token::READ_BYTE => {
@@ -114,7 +116,9 @@ fn interpret(code: &BFCode) {
         }
 
         cursor += 1;
-    }
+    };
+
+    return result;
 }
 
 #[cfg(test)]
