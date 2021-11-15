@@ -1,5 +1,6 @@
 [package]
-name = "brainfuck_interpreter"
+name = "rust_brainfuck"
+authors = ["NeoLight1010 <neolight1010@gmail.com>"]
 version = "0.1.0"
 edition = "2018"
 
